@@ -27,14 +27,30 @@ Unlike standard scanners, Abyss doesn't just collect data; it analyzes it. By co
 
 ## 🚀 Installation
 
+### Option 1: Via Homebrew (macOS / Linux)
+
+You can install Abyss directly using Homebrew.
+
+**Using the included Formula (Local):**
+```bash
+brew install --build-from-source Formula/abyss.rb
+```
+
+**Using a Custom Tap (Recommended once published):**
+```bash
+brew tap yourusername/abyss
+brew install abyss
+```
+
+### Option 2: Build from Source (Rust)
+
 Ensure you have the [Rust toolchain](https://rustup.rs/) installed.
 
 ```bash
-# Build the project
-cargo build --release
-
-# The binary will be available at
-./target/release/abyss --help
+# Clone and build
+git clone https://github.com/yourusername/abyss.git
+cd abyss
+cargo install --path .
 ```
 
 ## 📖 Usage
@@ -42,12 +58,12 @@ cargo build --release
 ### Comprehensive Scan with Intelligence Report
 Generate both a JSON output (stdout) and a beautiful HTML dashboard:
 ```bash
-./target/release/abyss --target example.com --html report.html
+abyss --target example.com --html report.html
 ```
 
 ### Pipe JSON into Data Pipelines
 ```bash
-./target/release/abyss --target example.com | jq '.dns.a_records'
+abyss --target example.com | jq '.dns.a_records'
 ```
 
 ### Investigation Workflow
