@@ -134,6 +134,22 @@ pub fn analyze_target(info: &TargetInfo) -> Intelligence {
                         .to_string(),
             });
         }
+
+        if !http.sensitive_files.is_empty() {
+            score += 80;
+            findings.push(Finding {
+                id: "SEC-02".to_string(),
+                severity: "Critical".to_string(),
+                title: "Exposed Sensitive Files Found".to_string(),
+                description: format!(
+                    "Found {} publicly accessible sensitive files/backups: {:?}. This is a critical information leak.",
+                    http.sensitive_files.len(),
+                    http.sensitive_files
+                ),
+                recommendation: "Immediately remove these files from the web server and investigate if they have been accessed by unauthorized parties."
+                    .to_string(),
+            });
+        }
     }
 
     // --- 4. Content Intelligence ---
