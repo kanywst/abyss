@@ -1,18 +1,27 @@
 use crate::models::TargetInfo;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Intelligence {
-    pub risk_score: u8, // 0 (Safe) - 100 (Critical)
-    pub risk_level: String, // Low, Medium, High, Critical
+    pub risk_score: u8,
+    pub risk_level: String,
     pub summary: String,
+    pub attribution: Attribution,
     pub findings: Vec<Finding>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Attribution {
+    pub probable_country: String,
+    pub operator_type: String,
+    pub infra_setup: String,
+    pub logic_reasoning: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Finding {
     pub id: String,
-    pub severity: String, // Info, Low, Medium, High, Critical
+    pub severity: String,
     pub title: String,
     pub description: String,
     pub recommendation: String,
@@ -21,132 +30,147 @@ pub struct Finding {
 pub fn analyze_target(info: &TargetInfo) -> Intelligence {
     let mut findings = Vec::new();
     let mut score = 0;
+    let mut attr = Attribution::default();
+    let mut reasoning = Vec::new();
 
-    // --- 1. WAF / CDN Analysis ---
+    // --- 1. Infrastructure Attribution ---
+    let ip_country = info
+        .dns
+        .geo_ip
+        .as_ref()
+        .map(|g| g.country.clone())
+        .unwrap_or_default();
+    attr.probable_country = if !ip_country.is_empty() {
+        ip_country
+    } else {
+        "Unknown".to_string()
+    };
+    reasoning.push(format!(
+        "Server infrastructure is physically hosted in {}.",
+        attr.probable_country
+    ));
+
+    if let Some(shodan) = &info.shodan {
+        if !shodan.ports.is_empty() {
+            reasoning.push(format!(
+                "Active services detected on {} ports: {:?}.",
+                shodan.ports.len(),
+                shodan.ports
+            ));
+        }
+        if !shodan.tags.is_empty() {
+            reasoning.push(format!(
+                "Shodan identifies this host as: {:?}.",
+                shodan.tags
+            ));
+        }
+    }
+
+    // --- 2. Identity & Concealment ---
+    let mut is_shady = false;
+    if let Some(whois) = &info.whois {
+        if whois.contains("Privacy") || whois.contains("REDACTED") || whois.contains("Withheld") {
+            is_shady = true;
+            reasoning.push(
+                "WHOIS identity is deliberately masked using a privacy proxy service.".to_string(),
+            );
+        }
+    }
+
     if let Some(http) = &info.http {
-        if let Some(waf) = &http.waf {
-            findings.push(Finding {
-                id: "INFRA-01".to_string(),
-                severity: "Info".to_string(),
-                title: format!("Protected by {}", waf),
-                description: format!("The target is behind {}, which masks the origin IP and provides protection against DDoS and web attacks.", waf),
-                recommendation: "Direct IP scanning will likely fail. Focus on application logic errors or finding the origin IP via other means (e.g. historical DNS).".to_string(),
-            });
+        if http.waf.is_some() {
+            attr.infra_setup = "Proxy-layered (WAF Protected)".to_string();
+            reasoning
+                .push("A WAF/CDN layer is used to obfuscate the real origin server.".to_string());
         } else {
-            score += 10;
-            findings.push(Finding {
-                id: "INFRA-02".to_string(),
-                severity: "Medium".to_string(),
-                title: "No WAF Detected".to_string(),
-                description: "No common Web Application Firewall (Cloudflare, Akamai, etc.) signatures were detected. The origin server might be directly exposed.".to_string(),
-                recommendation: "Consider implementing a WAF to protect against common web attacks and hide the origin infrastructure.".to_string(),
-            });
+            attr.infra_setup = "Directly Exposed Server".to_string();
+            score += 15;
         }
 
-        // --- 2. Security Headers Analysis ---
-        let issues = &http.security_issues;
-        if !issues.is_empty() {
-            let count = issues.len();
-            let severity = if count > 3 { "High" } else { "Medium" };
-            score += 5 * count as u8;
-            
-            findings.push(Finding {
-                id: "SEC-01".to_string(),
-                severity: severity.to_string(),
-                title: format!("Missing {} Security Headers", count),
-                description: format!("The web server is missing critical security headers: {}. This increases susceptibility to XSS, Clickjacking, and Man-in-the-Middle attacks.", issues.join(", ")),
-                recommendation: "Implement HSTS, Content-Security-Policy, and X-Frame-Options to harden the browser security posture.".to_string(),
-            });
+        if let Some(hash) = http.fingerprint.favicon_hash {
+            match hash {
+                0 => reasoning.push("Favicon is empty or failed to hash.".to_string()),
+                -127686963 => reasoning.push("Known Favicon: WordPress default icon.".to_string()),
+                1490706056 => reasoning.push("Known Favicon: Apache default page icon.".to_string()),
+                _ => reasoning.push(format!("Unique Favicon MMH3: {}. This can be used to track the operator across the web.", hash)),
+            }
         }
+    }
 
-        // --- 3. CMS / Technology ---
-        if let Some(cms) = &http.fingerprint.cms {
+    attr.operator_type = if is_shady {
+        "Anonymous Operator".to_string()
+    } else {
+        "Likely Commercial / Known Entity".to_string()
+    };
+
+    // --- 3. Vulnerability Findings ---
+    if let Some(shodan) = &info.shodan {
+        if !shodan.vulns.is_empty() {
+            score += 50;
             findings.push(Finding {
-                id: "TECH-01".to_string(),
-                severity: "Info".to_string(),
-                title: format!("CMS Detected: {}", cms),
-                description: format!("The site appears to be running on {}. CMS platforms often have specific vulnerability patterns.", cms),
-                recommendation: format!("Check for known vulnerabilities (CVEs) associated with {} and ensure it is updated to the latest version.", cms),
+                id: "VULN-01".to_string(),
+                severity: "Critical".to_string(),
+                title: "Known Vulnerabilities Detected".to_string(),
+                description: format!(
+                    "External databases identify known CVEs on this IP: {:?}.",
+                    shodan.vulns
+                ),
+                recommendation: "Patch the server software and restrict port exposure immediately."
+                    .to_string(),
             });
         }
     }
 
-    // --- 4. Subdomains / Attack Surface ---
-    if !info.subdomains.is_empty() {
-        let count = info.subdomains.len();
-        let dev_envs: Vec<_> = info.subdomains.iter()
-            .filter(|s| s.contains("dev") || s.contains("test") || s.contains("stage") || s.contains("admin"))
-            .collect();
-
-        if !dev_envs.is_empty() {
+    if let Some(http) = &info.http {
+        if !http.security_issues.is_empty() {
             score += 20;
             findings.push(Finding {
-                id: "SURFACE-01".to_string(),
+                id: "SEC-01".to_string(),
                 severity: "High".to_string(),
-                title: "Sensitive Subdomains Exposed".to_string(),
-                description: format!("Potentially sensitive non-production environments found: {:?}. These often have weaker security configurations than production.", dev_envs),
-                recommendation: "Ensure development and staging environments are not publicly accessible or are protected by strong authentication (VPN/SSO).".to_string(),
+                title: "Poor Security Header Hygiene".to_string(),
+                description: format!("Critical headers missing: {:?}.", http.security_issues),
+                recommendation:
+                    "Deploy HSTS, CSP, and X-Frame-Options to prevent browser-based attacks."
+                        .to_string(),
             });
         }
-
-        findings.push(Finding {
-            id: "SURFACE-02".to_string(),
-            severity: "Info".to_string(),
-            title: format!("Attack Surface: {} Subdomains", count),
-            description: "A larger number of subdomains increases the attack surface. Each subdomain represents a potential entry point.".to_string(),
-            recommendation: "Regularly audit these subdomains and decommission unused ones to reduce risk.".to_string(),
-        });
     }
 
-    // --- 5. SSL / TLS ---
-    if let Some(ssl) = &info.ssl {
-        // Simple check: Valid To
-        // In a real scenario, we'd parse the date properly.
-        // For MVP, just acknowledging it exists.
-        if ssl.sans.len() > 10 {
-             findings.push(Finding {
-                id: "SSL-01".to_string(),
+    // --- 4. Content Intelligence ---
+    if let Some(http) = &info.http {
+        if !http.fingerprint.emails.is_empty() {
+            findings.push(Finding {
+                id: "INTEL-01".to_string(),
                 severity: "Info".to_string(),
-                title: "Shared SSL Certificate".to_string(),
-                description: format!("The certificate covers {} domains (SANs). This is common for Cloudflare/CDNs but can also reveal related business domains.", ssl.sans.len()),
-                recommendation: "Review the SAN list to identify other potential targets or related infrastructure owned by the same entity.".to_string(),
+                title: "Exposed Email Addresses".to_string(),
+                description: format!("Found {} email addresses in the page content. These can be used for attribution or phishing.", http.fingerprint.emails.len()),
+                recommendation: "Evaluate if these emails belong to administrators or customers.".to_string(),
             });
         }
-    } else {
-        score += 30;
-        findings.push(Finding {
-            id: "SSL-02".to_string(),
-            severity: "High".to_string(),
-            title: "No SSL/TLS Detected".to_string(),
-            description: "Could not retrieve SSL certificate information. The service might be actively refusing connections or not using HTTPS.".to_string(),
-            recommendation: "Enforce HTTPS for all services to ensure data confidentiality and integrity.".to_string(),
-        });
     }
 
-    // --- Scoring Logic ---
-    if score > 100 { score = 100; }
+    // --- 5. Summary & Scoring ---
+    if score > 100 {
+        score = 100;
+    }
     let risk_level = match score {
-        0..=20 => "Low",
-        21..=50 => "Medium",
-        51..=80 => "High",
+        0..=30 => "Low",
+        31..=60 => "Medium",
+        61..=85 => "High",
         _ => "Critical",
-    }.to_string();
+    }
+    .to_string();
 
-    // --- Summary Generation ---
-    let summary = format!(
-        "Abyss Analysis concludes a **{} Risk** posture for {}. Key concerns include {}. The infrastructure appears to be {} with a {} attack surface ({} subdomains).",
-        risk_level,
-        info.domain,
-        if findings.is_empty() { "no obvious issues" } else { &findings[0].title },
-        if let Some(h) = &info.http { h.waf.as_deref().unwrap_or("directly exposed") } else { "unknown" },
-        if info.subdomains.len() > 10 { "broad" } else { "minimal" },
-        info.subdomains.len()
-    );
+    attr.logic_reasoning = reasoning;
+
+    let summary = format!("Abyss Intelligence identifies this as a {} project with a {} risk profile. The identity is {} and it uses a {} setup.", 
+        attr.operator_type, risk_level, if is_shady { "deliberately concealed" } else { "transparent" }, attr.infra_setup);
 
     Intelligence {
         risk_score: score,
         risk_level,
         summary,
+        attribution: attr,
         findings,
     }
 }

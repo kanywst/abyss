@@ -1,15 +1,16 @@
-mod models;
 mod dns;
 mod http;
+mod intelligence;
+mod models;
+mod report;
+mod shodan;
 mod ssl;
 mod subdomains;
 mod whois;
-mod report;
-mod intelligence; // 追加
 
+use anyhow::Result;
 use clap::Parser;
 use models::TargetInfo;
-use anyhow::Result;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -28,7 +29,10 @@ async fn main() -> Result<()> {
     let args = Args::parse();
     let target = args.target;
 
-    eprintln!("[*] Starting Abyss scan for: {}", target);
+    eprintln!(
+        "[*] Starting Abyss v0.1.0 'All-Seeing Eye' scan for: {}",
+        target
+    );
 
     let dns_future = dns::scan_dns(&target);
     let http_future = http::scan_http(&target);
@@ -36,10 +40,16 @@ async fn main() -> Result<()> {
     let sub_future = subdomains::scan_subdomains(&target);
     let whois_future = whois::scan_whois(&target);
 
-    let (dns_res, http_res, ssl_res, sub_res, whois_res) = 
-        tokio::join!(dns_future, http_future, ssl_future, sub_future, whois_future);
+    // Initial parallel scan
+    let (dns_res, http_res, ssl_res, sub_res, whois_res) = tokio::join!(
+        dns_future,
+        http_future,
+        ssl_future,
+        sub_future,
+        whois_future
+    );
 
-    let info = TargetInfo {
+    let mut info = TargetInfo {
         domain: target.clone(),
         dns: dns_res.unwrap_or_else(|e| {
             eprintln!("[!] DNS scan failed: {}", e);
@@ -52,7 +62,16 @@ async fn main() -> Result<()> {
             vec![]
         }),
         whois: whois_res.ok(),
+        shodan: None,
     };
+
+    // Sequential Scan: Shodan (Needs IP from DNS)
+    if let Some(geo) = &info.dns.geo_ip {
+        eprintln!("[*] Querying InternetDB (Shodan) for IP: {}", geo.ip);
+        if let Ok(shodan_data) = shodan::scan_internetdb(&geo.ip).await {
+            info.shodan = shodan_data;
+        }
+    }
 
     // Analyze Intelligence
     eprintln!("[*] Analyzing intelligence data...");
