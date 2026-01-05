@@ -29,10 +29,7 @@ async fn main() -> Result<()> {
     let args = Args::parse();
     let target = args.target;
 
-    eprintln!(
-        "[*] Starting Abyss v0.1.0 'All-Seeing Eye' scan for: {}",
-        target
-    );
+    eprintln!("[*] Starting Abyss scan for: {}", target);
 
     let dns_future = dns::scan_dns(&target);
     let http_future = http::scan_http(&target);

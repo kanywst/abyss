@@ -55,7 +55,7 @@ pub fn generate_html_report(info: &TargetInfo, intel: &Intelligence, filename: &
                 <p style="color: var(--text-muted);">Passive Intelligence Deep Reconnaissance</p>
             </div>
             <div style="text-align: right;">
-                <div class="font-mono" style="color: var(--secondary); font-weight: 700;">ABYSS v0.1.0</div>
+                <div class="font-mono" style="color: var(--secondary); font-weight: 700;">ABYSS</div>
                 <div id="gen-date" style="font-size: 0.8rem; color: var(--text-muted);"></div>
             </div>
         </header>
