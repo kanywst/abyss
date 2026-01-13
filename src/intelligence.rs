@@ -163,6 +163,27 @@ pub fn analyze_target(info: &TargetInfo) -> Intelligence {
                 recommendation: "Evaluate if these emails belong to administrators or customers.".to_string(),
             });
         }
+
+        // Pirate / Operator Fingerprints
+        if !http.fingerprint.crypto_wallets.is_empty() {
+            findings.push(Finding {
+                id: "INTEL-02".to_string(),
+                severity: "Medium".to_string(),
+                title: "Cryptocurrency Wallets Detected".to_string(),
+                description: format!("Found crypto addresses: {:?}. These are high-value indicators for tracking illicit revenue streams.", http.fingerprint.crypto_wallets),
+                recommendation: "Check these addresses against blockchain explorers and known abuse databases.".to_string(),
+            });
+        }
+
+        if !http.fingerprint.ga_ids.is_empty() || !http.fingerprint.adsense_ids.is_empty() {
+             findings.push(Finding {
+                id: "INTEL-03".to_string(),
+                severity: "Medium".to_string(),
+                title: "Ad/Analytics Trackers Found".to_string(),
+                description: format!("GA IDs: {:?}, AdSense: {:?}. These IDs often link multiple sites to a single operator.", http.fingerprint.ga_ids, http.fingerprint.adsense_ids),
+                recommendation: "Perform reverse lookups on these IDs (e.g., using DNSLytics or PublicWWW) to find the operator's other websites.".to_string(),
+            });
+        }
     }
 
     // --- 5. Summary & Scoring ---

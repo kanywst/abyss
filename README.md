@@ -43,7 +43,7 @@ brew install --build-from-source Formula/abyss.rb
 **Using a Custom Tap (Recommended once published):**
 
 ```bash
-brew tap yourusername/abyss
+brew tap kanywst/abyss
 brew install abyss
 ```
 
@@ -53,7 +53,7 @@ Ensure you have the [Rust toolchain](https://rustup.rs/) installed.
 
 ```bash
 # Clone and build
-git clone https://github.com/yourusername/abyss.git
+git clone https://github.com/kanywst/abyss.git
 cd abyss
 cargo install --path .
 ```

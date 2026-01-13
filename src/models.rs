@@ -42,13 +42,14 @@ pub struct HttpInfo {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Fingerprint {
-    pub page_title: Option<String>,       // New
-    pub meta_description: Option<String>, // New
-    pub favicon_hash: Option<i32>,        // New (Shodan format mmh3)
+    pub page_title: Option<String>,
+    pub meta_description: Option<String>,
+    pub favicon_hash: Option<i32>, // MurmurHash3
     pub generator: Option<String>,
     pub cms: Option<String>,
-    pub ga_ids: Vec<String>,
-    pub adsense_ids: Vec<String>,
+    pub ga_ids: Vec<String>,      // Google Analytics (UA-*, G-*)
+    pub adsense_ids: Vec<String>, // Google AdSense (pub-*)
+    pub crypto_wallets: Vec<String>, // BTC, ETH, XMR
     pub social_links: Vec<String>,
     pub emails: Vec<String>,
     pub external_links: Vec<String>,

@@ -1,7 +1,7 @@
 class Abyss < Formula
   desc "Deep Insight OSINT Tool for passive reconnaissance"
-  homepage "https://github.com/yourusername/abyss"
-  url "https://github.com/yourusername/abyss/archive/refs/tags/v0.3.0.tar.gz"
+  homepage "https://github.com/kanywst/abyss"
+  url "https://github.com/kanywst/abyss/archive/refs/tags/v0.3.0.tar.gz"
   sha256 "REPLACE_WITH_ACTUAL_SHA256_OF_TARBALL"
   license "MIT"
 

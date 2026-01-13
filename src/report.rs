@@ -17,6 +17,10 @@ pub fn generate_html_report(info: &TargetInfo, intel: &Intelligence, filename: &
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
     <style>
         :root { --bg: #02040a; --card: #0d1117; --primary: #58a6ff; --secondary: #bc8cff; --accent: #3fb950; --danger: #f85149; --warn: #d29922; --text: #c9d1d9; --text-muted: #8b949e; --border: #30363d; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -98,6 +102,14 @@ pub fn generate_html_report(info: &TargetInfo, intel: &Intelligence, filename: &
             </div>
 
             <!-- Bottom Sections -->
+            <div class="card col-span-12">
+                <div class="card-header">Connection Pathway (Visualized)</div>
+                <div class="mermaid" id="pathway-graph" style="display: flex; justify-content: center; background: #0d1117; padding: 1rem; border-radius: 6px;">
+                    graph LR
+                        Start((User)) --> Loading
+                </div>
+            </div>
+
             <div class="card col-span-4">
                 <div class="card-header">SSL / TLS Certificate</div>
                 <div class="scroll">
@@ -239,6 +251,7 @@ pub fn generate_html_report(info: &TargetInfo, intel: &Intelligence, filename: &
         let trackHtml = '';
         if(fp.ga_ids?.length) trackHtml += `<div><b>GA:</b> <span class="tracking-id">${fp.ga_ids.join(', ')}</span></div>`;
         if(fp.adsense_ids?.length) trackHtml += `<div><b>AdSense:</b> <span class="tracking-id">${fp.adsense_ids.join(', ')}</span></div>`;
+        if(fp.crypto_wallets?.length) trackHtml += `<div style="margin-top:0.5rem; border-top:1px dashed #333; padding-top:0.5rem;"><b>Crypto:</b><br>${fp.crypto_wallets.map(w => `<span class="badge" style="background:var(--warn); color:#000;">${w}</span>`).join(' ')}</div>`;
         el('tracking-ids').innerHTML = trackHtml || 'No tracking IDs found.';
 
         // Shodan
@@ -257,6 +270,48 @@ pub fn generate_html_report(info: &TargetInfo, intel: &Intelligence, filename: &
         el('whois-content').textContent = data.whois || 'No WHOIS available.';
         el('redirect-chain').innerHTML = (data.http?.redirect_chain || []).map((u, i) => `<div>${i+1}. ${u}</div>`).join('');
         el('robots-list').innerHTML = (data.http?.robots_txt || []).map(r => `<div>Disallow: ${r}</div>`).join('') || 'None';
+
+        // Mermaid Graph Generation
+        let graph = 'graph LR\n';
+        graph += '    User((User)) -->|Start Scan| D[Domain: ' + data.domain + ']\n';
+        
+        // DNS Path
+        if (data.dns) {
+            graph += '    D -->|Resolve| DNS{DNS}\n';
+            if (data.dns.a_records && data.dns.a_records.length > 0) {
+                 data.dns.a_records.forEach((ip, i) => {
+                     let nodeId = 'IP' + i;
+                     graph += `    DNS -->|A Record| ${nodeId}[${ip}]\n`;
+                     
+                     // GeoIP Link
+                     if (data.dns.geo_ip && data.dns.geo_ip.ip === ip) {
+                         graph += `    ${nodeId} -->|Hosted In| GEO[${data.dns.geo_ip.country} / ${data.dns.geo_ip.isp.replace(/[^a-zA-Z0-9 ]/g, '')}]\n`;
+                     }
+                 });
+            }
+        }
+
+        // Redirect Path
+        if (data.http && data.http.redirect_chain && data.http.redirect_chain.length > 0) {
+             let chain = data.http.redirect_chain;
+             chain.forEach((url, i) => {
+                 let safeUrl = url.replace(/["'()]/g, '');
+                 if (safeUrl.length > 30) safeUrl = safeUrl.substring(0, 27) + '...';
+                 let nodeId = 'R' + i;
+                 if (i === 0) {
+                     graph += `    D -.->|HTTP Req| ${nodeId}(${safeUrl})\n`;
+                 } else {
+                     graph += `    R${i-1} -->|3xx Redirect| ${nodeId}(${safeUrl})\n`;
+                 }
+             });
+        }
+
+        // Final Node attributes
+        graph += '    classDef default fill:#0d1117,stroke:#30363d,stroke-width:1px,color:#c9d1d9;\n';
+        graph += '    classDef accent fill:#1f6feb,stroke:#58a6ff,color:#fff;\n';
+        graph += '    class GEO accent;\n';
+
+        el('pathway-graph').textContent = graph;
     </script>
 </body>
 </html>

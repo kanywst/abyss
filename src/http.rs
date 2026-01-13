@@ -1,6 +1,6 @@
 use crate::models::{Fingerprint, HttpInfo};
 use anyhow::Result;
-use base64::{engine::general_purpose, Engine as _};
+use base64::{Engine as _, engine::general_purpose};
 use murmur3::murmur3_32;
 use regex::Regex;
 use scraper::{Html, Selector};
@@ -16,7 +16,7 @@ pub async fn scan_http(domain: &str) -> Result<HttpInfo> {
 
     let client = reqwest::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
-        .user_agent("Mozilla/5.0 (compatible; Abyss/1.0; +https://github.com/yourusername/abyss)")
+        .user_agent("Mozilla/5.0 (compatible; Abyss/1.0; +https://github.com/kanywst/abyss)")
         .build()?;
 
     let mut current_url = base_url;
@@ -233,7 +233,8 @@ fn analyze_content(html_content: &str) -> Fingerprint {
         }
     }
 
-    if let Ok(re_link) = Regex::new("http[s]?://[a-zA-Z0-9./-]+") {
+    // Social Links
+    if let Ok(re_link) = Regex::new(r"https?://[a-zA-Z0-9./-]+") {
         let social_domains = vec![
             "facebook.com",
             "twitter.com",
@@ -242,6 +243,8 @@ fn analyze_content(html_content: &str) -> Fingerprint {
             "linkedin.com",
             "youtube.com",
             "t.me",
+            "discord.gg",
+            "discord.com/invite",
         ];
         for cap in re_link.captures_iter(html_content) {
             let link = cap[0].to_string();
@@ -259,11 +262,41 @@ fn analyze_content(html_content: &str) -> Fingerprint {
         }
     }
 
-    fp.tech_stack = tech.into_iter().collect();
-    if let Ok(re_ua) = Regex::new("UA-[0-9-]+") {
+    // Google Analytics UA & G-ID
+    if let Ok(re_ua) = Regex::new(r"UA-\d+-\d+") {
         for cap in re_ua.captures_iter(html_content) {
             fp.ga_ids.push(cap[0].to_string());
         }
     }
+    if let Ok(re_gid) = Regex::new(r"G-[A-Z0-9]{10}") {
+        for cap in re_gid.captures_iter(html_content) {
+            fp.ga_ids.push(cap[0].to_string());
+        }
+    }
+
+    // AdSense
+    if let Ok(re_ads) = Regex::new(r"pub-\d{16}") {
+        for cap in re_ads.captures_iter(html_content) {
+            fp.adsense_ids.push(cap[0].to_string());
+        }
+    }
+
+    // Crypto Wallets
+    // BTC: 1 or 3 start, 26-35 length (simplified) or bc1 (bech32)
+    if let Ok(re_btc) = Regex::new(
+        r"\b(1[a-km-zA-HJ-NP-Z1-9]{25,34}|3[a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-zA-HJ-NP-Z0-9]{39,59})",
+    ) {
+        for cap in re_btc.captures_iter(html_content) {
+            fp.crypto_wallets.push(format!("BTC: {}", &cap[0]));
+        }
+    }
+    // ETH: 0x start, 40 hex chars
+    if let Ok(re_eth) = Regex::new(r"\b0x[a-fA-F0-9]{40}\b") {
+        for cap in re_eth.captures_iter(html_content) {
+            fp.crypto_wallets.push(format!("ETH: {}", &cap[0]));
+        }
+    }
+
+    fp.tech_stack = tech.into_iter().collect();
     fp
 }
