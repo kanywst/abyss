@@ -1,10 +1,10 @@
 use crate::core::Result;
-use crate::models::{DnsData, CloudProvider};
+use crate::models::{CloudProvider, DnsData};
 use hickory_resolver::TokioAsyncResolver;
 // use hickory_resolver::proto::xfer::DnsRequest; // Simplified for now
 
 pub async fn scan_dns(target: &str) -> Result<(DnsData, Option<CloudProvider>)> {
-    let resolver = TokioAsyncResolver::tokio_from_system_conf().unwrap();
+    let resolver = TokioAsyncResolver::tokio_from_system_conf()?;
     let mut dns_data = DnsData::default();
     let mut cloud_provider = None;
 
@@ -32,11 +32,20 @@ pub async fn scan_dns(target: &str) -> Result<(DnsData, Option<CloudProvider>)> 
     // Cloud Identification based on MX/CNAME hints
     for mx in &dns_data.mx {
         if mx.contains("google.com") {
-            cloud_provider = Some(CloudProvider { name: "Google Workspace".to_string(), risk_level: "Low".to_string() });
+            cloud_provider = Some(CloudProvider {
+                name: "Google Workspace".to_string(),
+                risk_level: "Low".to_string(),
+            });
         } else if mx.contains("outlook.com") {
-             cloud_provider = Some(CloudProvider { name: "Microsoft 365".to_string(), risk_level: "Low".to_string() });
+            cloud_provider = Some(CloudProvider {
+                name: "Microsoft 365".to_string(),
+                risk_level: "Low".to_string(),
+            });
         } else if mx.contains("pphosted.com") {
-             cloud_provider = Some(CloudProvider { name: "Proofpoint".to_string(), risk_level: "Low".to_string() });
+            cloud_provider = Some(CloudProvider {
+                name: "Proofpoint".to_string(),
+                risk_level: "Low".to_string(),
+            });
         }
     }
 
@@ -44,9 +53,9 @@ pub async fn scan_dns(target: &str) -> Result<(DnsData, Option<CloudProvider>)> 
     // Real AXFR requires TCP connection to NS.
     // For this CLI tool, we will try to list NS first, then maybe impl AXFR later or just placeholder.
     // Implementing full AXFR with hickory is verbose.
-    // We will leave the field in struct but maybe skip active AXFR in this turn to ensure stability, 
+    // We will leave the field in struct but maybe skip active AXFR in this turn to ensure stability,
     // or add a basic NS lookup to populate potential targets.
-    
+
     // NS Lookup
     if let Ok(_lookup) = resolver.ns_lookup(target).await {
         // If we found NS records, we *could* try AXFR.

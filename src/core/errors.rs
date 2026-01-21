@@ -8,6 +8,8 @@ pub enum AbyssError {
     Io(#[from] std::io::Error),
     #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
+    #[error("DNS error: {0}")]
+    Dns(#[from] hickory_resolver::error::ResolveError),
     #[error("Unknown error: {0}")]
     Unknown(String),
 }

@@ -13,6 +13,7 @@ dependencies = [
  "colored",
  "hickory-resolver",
  "murmur3",
+ "once_cell",
  "regex",
  "reqwest",
  "scraper",

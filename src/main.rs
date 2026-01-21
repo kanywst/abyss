@@ -32,19 +32,20 @@ async fn main() -> anyhow::Result<()> {
         log_info("Phase 1: Scanning target infrastructure...");
     }
     let dns_task = modules::dns::scan_dns(&config.target);
-    let http_task = modules::http::scan_http(&config.target, &client);
+    let http_task = modules::http::scan_http(&config.target, &client, config.concurrency);
     let (dns_res, http_res) = tokio::join!(dns_task, http_task);
 
-    let (dns_data, cloud_res) = dns_res.unwrap_or_else(|e| {
-        if !config.quiet {
-            log_error(&format!("DNS Scan Failed: {}", e));
+    let (dns_data, cloud_res) = match dns_res {
+        Ok(data) => data,
+        Err(e) => {
+            log_error(&format!("Core DNS Scan Failed: {}. Aborting.", e));
+            return Err(e.into());
         }
-        (Default::default(), None)
-    });
+    };
 
     let (http_data, secrets, mut attribution) = http_res.unwrap_or_else(|e| {
         if !config.quiet {
-            log_error(&format!("HTTP Scan Failed: {}", e));
+            log_error(&format!("HTTP Scan Failed (Continuing): {}", e));
         }
         (None, vec![], Default::default())
     });

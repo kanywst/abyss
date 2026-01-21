@@ -8,7 +8,7 @@ pub struct TargetData {
     pub attribution: AttributionData,
     pub secrets: Vec<SecretFound>,
     pub cloud: Option<CloudProvider>,
-    
+
     // Intelligence
     pub ssl_intelligence: SslIntel,
     pub geo_intelligence: GeoIntel,
@@ -38,8 +38,8 @@ pub struct HttpData {
     pub tech_stack: Vec<String>,
     pub meta_generator: Option<String>,
     pub js_analysis: Vec<JsFileResult>,
-    pub robots_txt: Vec<String>, // NEW
-    pub sitemaps: Vec<String>,   // NEW
+    pub robots_txt: Vec<String>,      // NEW
+    pub sitemaps: Vec<String>,        // NEW
     pub security_txt: Option<String>, // NEW
 }
 
