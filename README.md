@@ -1,88 +1,111 @@
-# Abyss 🌌 - Deep Insight OSINT Tool
+<div align="center">
 
-**Abyss** is a high-performance, professional-grade OSINT (Open Source Intelligence) command-line tool written in Rust. It is designed for researchers and security professionals to perform **passive reconnaissance**, **active vulnerability checks**, and **automated intelligence analysis** on web infrastructure.
+# 🕳️ Abyss
 
-Unlike standard scanners, Abyss doesn't just collect data; it analyzes it. By correlating DNS, HTTP, SSL, Subdomain, and Threat Intelligence data, it provides a logical assessment of a target's security posture and ownership footprint.
+**Deep Intelligence & Passive Reconnaissance Platform**
 
-## ✨ Features
+[![Rust](https://img.shields.io/badge/built_with-Rust-dca282.svg)](https://www.rust-lang.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/takumaniwa/abyss/actions/workflows/ci.yml/badge.svg)](https://github.com/takumaniwa/abyss/actions)
 
-- **🧠 Intelligence Engine:** Automatically analyzes gathered data to produce an **Executive Summary**, **Risk Score (0-100)**, and actionable **Security Recommendations**.
-- **🔍 Passive Subdomain Enumeration:** Leverages Certificate Transparency (CT) logs via `crt.sh` to find hidden subdomains without touching the target's infrastructure.
-- **🛡️ Infrastructure Fingerprinting:** Identifies WAF/CDN layers (Cloudflare, Akamai), CMS platforms, and extracts tracking IDs (Google Analytics, AdSense).
-- **📂 Sensitive File Discovery:** scans for exposed critical files (e.g., `.env`, `.git/config`, `backup.sql`) that often lead to identity leakage (inspired by the Mangamura case).
-- **💀 Active Vulnerability Checks:** Integrates with **InternetDB (Shodan)** to identify open ports, CPEs, and unpatched vulnerabilities (CVEs) for the target IP.
-- **📋 Security Audit:** Diagnoses missing security headers (HSTS, CSP, X-Frame-Options) and evaluates the overall attack surface.
-- **📜 Deep SSL/TLS Inspection:** Full extraction of Subject Alternative Names (SANs) and Issuer details.
-- **🕵️ Asynchronous Whois:** Custom TCP-based client that follows referral chains to the actual registrar.
-- **🌐 Passive DNS & GeoIP:** Maps A, MX, and TXT records to physical locations and ISPs.
-- **📊 Full-Disclosure HTML Report:** Generates a modern, HUD-style interactive dashboard containing **100% of the gathered data** with zero truncation.
-- **🚀 Concurrent Architecture:** Built on `tokio` for lightning-fast, non-blocking parallel execution of all modules.
+<img src="demo.gif" alt="Abyss Demo" width="800" style="border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
 
-## 🛠️ Tech Stack
+<br>
 
-- **Runtime:** [Tokio](https://tokio.rs/) (Async I/O)
-- **HTTP Client:** [Reqwest](https://docs.rs/reqwest/)
-- **DNS Resolver:** [Hickory Resolver](https://hickory-dns.org/)
-- **Threat Intel:** InternetDB (Shodan) API
-- **Intelligence:** Custom Rule Engine
-- **SSL Parsing:** [Rustls](https://github.com/rustls/rustls) & [x509-parser](https://docs.rs/x509-parser/)
-- **HTML Generation:** Custom Template Engine (Single File HTML)
+**Abyss** is a high-performance intelligence platform designed for **identifying the operators** behind target infrastructure. It excels at unmasking pirate sites, scam operations, and shadow IT by correlating hidden identifiers and querying global intelligence networks.
 
-## 🚀 Installation
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Attribution Strategy](#-attribution-strategy)
 
-### Option 1: Via Homebrew (macOS / Linux)
+</div>
 
-You can install Abyss directly using Homebrew.
+---
 
-**Using the included Formula (Local):**
+## Key Features
+
+### Operator Attribution
+
+Abyss extracts unique fingerprints to link anonymous sites to their owners:
+
+- **Favicon Pivoting**: Calculates MurmurHash3 of favicons to find the real origin IP (Shodan/Censys compatible).
+- **ID Tracking**: Scrapes Google Analytics (`UA-`, `G-`), AdSense (`pub-`), Facebook Pixel IDs, and Amazon Associates tags.
+- **Site Verification**: Extracts Google, Facebook, Apple, and Yandex verification codes.
+- **Crypto Forensics**: Identifies BTC/ETH wallet addresses used for donations or payments.
+- **Contact Extraction**: Automatically finds emails, phone numbers, and social media profiles.
+
+### Secret Mining & JS Analysis
+
+Deep analysis of frontend assets to find leaked credentials and endpoints:
+
+- **Credential Detection**: Scans for AWS Keys, Google API Keys, Slack Tokens, Stripe Secrets, and Private Keys.
+- **Endpoint Discovery**: Extracts internal and hidden API endpoints from Javascript bundles.
+- **Metadata Analysis**: Inspects `robots.txt`, `sitemaps.xml`, `security.txt`, and meta generator tags.
+
+### Global Intelligence Integration (Total Recall)
+
+Queries multiple external sources in parallel for a comprehensive view:
+
+- **Passive DNS & SSL**: Leverages crt.sh and AlienVault OTX for historical subdomains and SSL identities.
+- **Web Archives**: Pulls historical data and discovery timestamps from the Wayback Machine.
+- **GitHub Leaks**: Searches for sensitive data leaked in public repositories.
+- **Infrastructure Intel**: Queries Shodan InternetDB for open ports and known vulnerabilities.
+- **GeoIP & ASN**: Provides precise location and network ownership data (IP, ISP, Org, ASN).
+
+### Intelligence Reporting
+
+- **JSON Output**: Clean, structured data for pipeline integration.
+- **Visual Dashboard**: Generates a self-contained, dark-mode HTML report for stakeholders.
+
+---
+
+## Installation
 
 ```bash
-brew install --build-from-source Formula/abyss.rb
-```
-
-**Using a Custom Tap (Recommended once published):**
-
-```bash
-brew tap kanywst/abyss
-brew install abyss
-```
-
-### Option 2: Build from Source (Rust)
-
-Ensure you have the [Rust toolchain](https://rustup.rs/) installed.
-
-```bash
-# Clone and build
-git clone https://github.com/kanywst/abyss.git
+git clone https://github.com/takumaniwa/abyss.git
 cd abyss
-cargo install --path .
+make build
+# Binary is located at ./target/release/abyss
 ```
 
-## 📖 Usage
+## Usage
 
-### Comprehensive Scan with Intelligence Report
+### Standard Scan
 
-Generate both a JSON output (stdout) and a beautiful HTML dashboard:
+Run a full intelligence scan against a target.
 
 ```bash
-abyss --target example.com --html report.html
+abyss -t example.com
 ```
 
-### Pipe JSON into Data Pipelines
+### Generate Report
+
+Create a visual intelligence dashboard.
 
 ```bash
-abyss --target example.com | jq '.dns.a_records'
+abyss -t example.com --html report.html
 ```
 
-### Investigation Workflow
+### Pipeline Integration (JSON)
 
-1. Run scan: `abyss --target target.com --html report.html`
-2. Open `report.html` in your browser.
-3. Review the **Risk Score** and **Recommendations**.
-4. Check **Sensitive Files** for any accidentally exposed backups or config files.
-5. Explore the **Subdomain List** and **Shodan Vulnerabilities** to find unhardened origin servers.
+Extract specific IDs for correlation.
 
-## ⚖️ Disclaimer
+```bash
+# Get all AdSense IDs associated with a domain
+abyss -t example.com --quiet | jq '.attribution.adsense_ids[]'
 
-Abyss is intended for **legal security research and authorized testing only**. While it primarily relies on passive data sources (OSINT), features like sensitive file scanning involve active requests to the target server.
-**Do not scan targets you do not own or have explicit permission to test.** The authors assume no liability for misuse.
+# Extract discovered API endpoints from JS files
+abyss -t example.com --quiet | jq '.http.js_analysis[].endpoints[]'
+```
+
+## Attribution Strategy
+
+To identify a pirate site operator hiding behind Cloudflare:
+
+1. **Run Abyss**: `abyss -t pirate-site.com`
+2. **Get Favicon Hash**: Note the `favicon_hash` from the output.
+3. **Search Shodan**: Use `http.favicon.hash:<hash>` to find the Origin IP.
+4. **Track Ads**: Search PublicWWW or similar engines for the `pub-xxxxxxxx` AdSense ID or Facebook Pixel ID to find other sites owned by the same entity.
+5. **GitHub Recon**: Review `github_leaks` for any repository mentions or developer credentials.
+
+## License
+
+MIT License.

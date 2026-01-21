@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abyss Total Recall: njavtv.com</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --border: #334155;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-primary); color: var(--text-primary); margin: 0; padding: 0; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 40px 20px; }
+        header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { margin: 0; font-size: 2.5rem; background: linear-gradient(90deg, var(--accent), #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
+        .card { background: var(--bg-secondary); border-radius: 12px; padding: 25px; border: 1px solid var(--border); overflow: hidden; }
+        .card h2 { margin-top: 0; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 1.2rem; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.9rem; word-break: break-all; }
+        li:last-child { border-bottom: none; }
+        .tag { background: var(--border); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .danger { color: var(--danger); font-weight: bold; }
+        .scroll-box { max-height: 400px; overflow-y: auto; background: #0f172a; border-radius: 8px; padding: 10px; }
+        .screenshot { width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-top: 10px; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Abyss Total Recall</h1>
+                <p style="color: var(--text-secondary);">Target Domain: <strong>njavtv.com</strong></p>
+            </div>
+            <div style="text-align: right;">
+                <div class="tag">0.2.0 Final</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">2026-01-21 23:03:17</div>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- 1. URLScan Screenshot (NEW: Visual Evidence) -->
+            <div class="card" style="grid-column: span 2;">
+                <h2>📸 Visual Evidence (Latest Screenshot)</h2>
+                <img src='https://urlscan.io/screenshots/019bd781-efbe-74c8-84ce-2ccbb22d099f.png' class='screenshot' alt='Latest Screenshot'><p style='font-size:0.8rem; color:var(--text-secondary);'>Taken on: 2026-01-19T18:26:38.657Z (<a href='https://urlscan.io/api/v1/result/019bd781-efbe-74c8-84ce-2ccbb22d099f/' target='_blank'>View Full Result</a>)</p>
+            </div>
+
+            <!-- 2. Attribution & Operator ID -->
+            <div class="card" style="border-color: var(--accent);">
+                <h2>🕵️ Operator Attribution</h2>
+                <ul>
+                    <li><span>Favicon Hash</span> <strong><a href="https://www.shodan.io/search?query=http.favicon.hash:-2091978111" target="_blank">-2091978111</a></strong></li>
+                    <li><span>GA / Tracking IDs</span> <span></span></li>
+                    <li><span>AdSense / Ads</span> <span></span></li>
+                    <li><span>Affiliate / Pixel IDs</span> <span></span></li>
+                    <li><span>Crypto Wallets</span> <span></span></li>
+                    <li><span>Phone Numbers</span> <span>747-4072-8606, 5-9643-694829, 9938-6414280, 14.707 12.707, 87799-4663-453, 0 0116.138, 867 12.142, 5-4794-8947, 438-49408483390, 3418-4232-8433, 700-70846412802, 3711506524</span></li>
+                    <li><span>Emails</span> <span></span></li>
+                </ul>
+            </div>
+
+            <!-- 3. Secrets & Leaks -->
+            <div class="card" style="border-color: var(--danger);">
+                <h2>🔑 Exposed Secrets & Leaked Keys</h2>
+                <div class="scroll-box">
+                    <p style='color: var(--success);'>No secrets detected.</p>
+                </div>
+                 <p style="margin-top: 10px;"><a href="https://github.com/search?q=njavtv.com&type=code" target="_blank">🔎 Deep Search GitHub</a></p>
+            </div>
+
+            <!-- 4. Threat Intel (AlienVault & Shodan) -->
+            <div class="card" style="border-color: var(--warning);">
+                <h2>☣️ Threat Intelligence & Vulnerabilities</h2>
+                <ul>
+                    <li><span>Shodan Open Ports</span> <span class="tag">80, 443, 2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 8080, 8443, 8880</span></li>
+                    <li><span>Known Vulnerabilities (CVE)</span> <span class="danger"></span></li>
+                    <li><span>AlienVault Malware Samples</span> <span>0</span></li>
+                    <li><span>Threat Tags</span> <span></span></li>
+                </ul>
+            </div>
+
+            <!-- 5. GeoIP & Infrastructure (GeoIP, DNS, Reverse DNS) -->
+            <div class="card">
+                <h2>🌍 Infrastructure Mapping</h2>
+                <ul>
+                    <li><span>Primary IP</span> <strong>172.67.70.97</strong></li>
+                    <li><span>Location</span> <span>Toronto, Canada</span></li>
+                    <li><span>ISP / ASN</span> <span>Cloudflare, Inc. (AS13335 Cloudflare, Inc.)</span></li>
+                    <li><span>Cloud Provider</span> <span class="tag">Unknown</span></li>
+                    <li><span>Server Banner</span> <span>cloudflare</span></li>
+                    <li><span>MX Banners</span> <span>2</span></li>
+                </ul>
+            </div>
+
+            <!-- 6. DNS & Network Neighbors (Reverse DNS) -->
+            <div class="card">
+                <h2>🕸️ Network Neighbors (Reverse DNS)</h2>
+                <div class="scroll-box">
+                    <ul><li>No data found</li></ul>
+                </div>
+            </div>
+
+            <!-- 7. Certificate Transparency (crt.sh) -->
+            <div class="card">
+                <h2>📜 SSL Certificate Intelligence (Related Domains)</h2>
+                <div class="scroll-box">
+                    <ul><li>*.njavtv.com</li><li>cdn.njavtv.com</li><li>cover.njavtv.com</li><li>njavtv.com</li><li>preview.njavtv.com</li><li>static.njavtv.com</li><li>thumbnail.njavtv.com</li><li>video.njavtv.com</li></ul>
+                </div>
+            </div>
+
+            <!-- 8. Wayback Machine (Time Travel) -->
+            <div class="card">
+                <h2>🕰️ Time Travel (Wayback Archives)</h2>
+                <div class="scroll-box">
+                    <ul><li><a href='http://web.archive.org/web/20220908012247id_/https://njavtv.com/' target='_blank'>20220908012247</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20220923053357id_/https://njavtv.com/' target='_blank'>20220923053357</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20221008012342id_/https://njavtv.com/' target='_blank'>20221008012342</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20221008012413id_/https://njavtv.com/' target='_blank'>20221008012413</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20221023012355id_/https://njavtv.com/' target='_blank'>20221023012355</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20221107012456id_/https://njavtv.com/' target='_blank'>20221107012456</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20221122115503id_/https://njavtv.com/' target='_blank'>20221122115503</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20221207030403id_/https://njavtv.com/' target='_blank'>20221207030403</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20221222012812id_/https://njavtv.com/' target='_blank'>20221222012812</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230106014840id_/https://njavtv.com/' target='_blank'>20230106014840</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230121012914id_/https://njavtv.com/' target='_blank'>20230121012914</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230205013004id_/https://njavtv.com/' target='_blank'>20230205013004</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230214080715id_/http://njavtv.com/' target='_blank'>20230214080715</a> <span class='tag'>-</span></li><li><a href='http://web.archive.org/web/20230220013107id_/https://njavtv.com/' target='_blank'>20230220013107</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230307013226id_/https://njavtv.com/' target='_blank'>20230307013226</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230313182647id_/https://njavtv.com/' target='_blank'>20230313182647</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230322101246id_/https://njavtv.com/' target='_blank'>20230322101246</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230323110435id_/http://njavtv.com/' target='_blank'>20230323110435</a> <span class='tag'>-</span></li><li><a href='http://web.archive.org/web/20230402084032id_/https://njavtv.com/' target='_blank'>20230402084032</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230405060602id_/http://njavtv.com/' target='_blank'>20230405060602</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20230406101336id_/https://njavtv.com/' target='_blank'>20230406101336</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230406131433id_/https://njavtv.com/' target='_blank'>20230406131433</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230409125537id_/http://njavtv.com/' target='_blank'>20230409125537</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20230409125915id_/https://njavtv.com/' target='_blank'>20230409125915</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230421112845id_/https://njavtv.com/' target='_blank'>20230421112845</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230423093301id_/http://njavtv.com/' target='_blank'>20230423093301</a> <span class='tag'>403</span></li><li><a href='http://web.archive.org/web/20230506101907id_/https://njavtv.com/' target='_blank'>20230506101907</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230511183228id_/https://njavtv.com/' target='_blank'>20230511183228</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230521135811id_/https://njavtv.com/' target='_blank'>20230521135811</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230528224450id_/https://njavtv.com/' target='_blank'>20230528224450</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230602024135id_/https://njavtv.com/' target='_blank'>20230602024135</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230702013700id_/https://njavtv.com/' target='_blank'>20230702013700</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230702013852id_/https://njavtv.com/' target='_blank'>20230702013852</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230702052331id_/https://njavtv.com/' target='_blank'>20230702052331</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230710060906id_/https://njavtv.com/' target='_blank'>20230710060906</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20230924234011id_/https://njavtv.com/' target='_blank'>20230924234011</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20231114034028id_/https://njavtv.com/' target='_blank'>20231114034028</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20231121062113id_/https://njavtv.com/' target='_blank'>20231121062113</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20231219114007id_/https://njavtv.com/' target='_blank'>20231219114007</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20231226202128id_/https://njavtv.com/' target='_blank'>20231226202128</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20231228073205id_/https://njavtv.com/' target='_blank'>20231228073205</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240114161420id_/https://njavtv.com/' target='_blank'>20240114161420</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240120063524id_/https://njavtv.com/' target='_blank'>20240120063524</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240201191707id_/https://njavtv.com/' target='_blank'>20240201191707</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240207223219id_/https://njavtv.com/' target='_blank'>20240207223219</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240210055228id_/https://njavtv.com/' target='_blank'>20240210055228</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240213182840id_/https://njavtv.com/' target='_blank'>20240213182840</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240214232732id_/https://njavtv.com/' target='_blank'>20240214232732</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240216113057id_/https://njavtv.com/' target='_blank'>20240216113057</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240220021245id_/https://njavtv.com/' target='_blank'>20240220021245</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240228073705id_/https://njavtv.com' target='_blank'>20240228073705</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240228223300id_/https://njavtv.com' target='_blank'>20240228223300</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240301072148id_/https://njavtv.com/' target='_blank'>20240301072148</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240304103022id_/https://njavtv.com/' target='_blank'>20240304103022</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240306092749id_/https://njavtv.com/' target='_blank'>20240306092749</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240309004304id_/https://njavtv.com/' target='_blank'>20240309004304</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240316122822id_/https://njavtv.com/' target='_blank'>20240316122822</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240319194437id_/https://njavtv.com/' target='_blank'>20240319194437</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240319194438id_/http://njavtv.com/' target='_blank'>20240319194438</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240324194059id_/https://njavtv.com/' target='_blank'>20240324194059</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240404152228id_/https://njavtv.com/' target='_blank'>20240404152228</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240419214111id_/https://njavtv.com/' target='_blank'>20240419214111</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240424070752id_/https://njavtv.com/' target='_blank'>20240424070752</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240424132021id_/http://njavtv.com/' target='_blank'>20240424132021</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240503191924id_/https://njavtv.com/' target='_blank'>20240503191924</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240504065007id_/http://njavtv.com/' target='_blank'>20240504065007</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240504154500id_/https://njavtv.com/' target='_blank'>20240504154500</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240504211928id_/http://njavtv.com/' target='_blank'>20240504211928</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240517190338id_/https://njavtv.com/' target='_blank'>20240517190338</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240517190811id_/http://njavtv.com/' target='_blank'>20240517190811</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240518064534id_/https://njavtv.com/' target='_blank'>20240518064534</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240518094050id_/http://njavtv.com/' target='_blank'>20240518094050</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240518182711id_/https://njavtv.com/' target='_blank'>20240518182711</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240520041709id_/http://njavtv.com/' target='_blank'>20240520041709</a> <span class='tag'>-</span></li><li><a href='http://web.archive.org/web/20240601053656id_/https://njavtv.com/' target='_blank'>20240601053656</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240602181012id_/https://njavtv.com/' target='_blank'>20240602181012</a> <span class='tag'>200</span></li><li><a href='http://web.archive.org/web/20240609202934id_/http://njavtv.com/' target='_blank'>20240609202934</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240617231407id_/https://njavtv.com/' target='_blank'>20240617231407</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240703145655id_/https://njavtv.com/' target='_blank'>20240703145655</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240715184046id_/https://njavtv.com/' target='_blank'>20240715184046</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240715184500id_/http://njavtv.com/' target='_blank'>20240715184500</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240813201622id_/https://njavtv.com/' target='_blank'>20240813201622</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240818055138id_/https://njavtv.com/' target='_blank'>20240818055138</a> <span class='tag'>403</span></li><li><a href='http://web.archive.org/web/20240831195749id_/https://njavtv.com/' target='_blank'>20240831195749</a> <span class='tag'>403</span></li><li><a href='http://web.archive.org/web/20240901111141id_/https://njavtv.com/' target='_blank'>20240901111141</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240906065453id_/https://njavtv.com/' target='_blank'>20240906065453</a> <span class='tag'>403</span></li><li><a href='http://web.archive.org/web/20240913005045id_/https://njavtv.com/' target='_blank'>20240913005045</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240913011029id_/http://njavtv.com/' target='_blank'>20240913011029</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20240916174239id_/https://njavtv.com/' target='_blank'>20240916174239</a> <span class='tag'>403</span></li><li><a href='http://web.archive.org/web/20240916225532id_/https://njavtv.com/' target='_blank'>20240916225532</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20241001072614id_/https://njavtv.com/' target='_blank'>20241001072614</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20241002045637id_/https://njavtv.com/' target='_blank'>20241002045637</a> <span class='tag'>403</span></li><li><a href='http://web.archive.org/web/20241101080131id_/https://njavtv.com/' target='_blank'>20241101080131</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20241105083347id_/http://njavtv.com/' target='_blank'>20241105083347</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20241114081722id_/https://njavtv.com/' target='_blank'>20241114081722</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20241129214058id_/https://njavtv.com/' target='_blank'>20241129214058</a> <span class='tag'>301</span></li><li><a href='http://web.archive.org/web/20241202212415id_/http://njavtv.com/' target='_blank'>20241202212415</a> <span class='tag'>-</span></li><li><a href='http://web.archive.org/web/20250108162644id_/http://njavtv.com/' target='_blank'>20250108162644</a> <span class='tag'>403</span></li><li><a href='http://web.archive.org/web/20250108163352id_/https://njavtv.com/' target='_blank'>20250108163352</a> <span class='tag'>403</span></li><li><a href='http://web.archive.org/web/20250301051442id_/https://njavtv.com/' target='_blank'>20250301051442</a> <span class='tag'>301</span></li></ul>
+                </div>
+            </div>
+
+            <!-- 9. JS Deep Dive -->
+            <div class="card">
+                <h2>📜 JavaScript Deep Analysis</h2>
+                <div class="scroll-box">
+                    <ul><li><div><strong>https://njavtv.com/build/assets/app.1aad5686.js</strong></div><div style='font-size:0.8rem'>Endpoints: 4 | Secrets: <span class='danger'>0</span></div></li></ul>
+                </div>
+            </div>
+
+            <!-- 10. Sensitive Files (Robots, Sitemap, Security) -->
+            <div class="card">
+                <h2>📂 Sensitive Config Files</h2>
+                <ul>
+                    <li><span>Security.txt</span> <span>Not Found</span></li>
+                    <li><span>Robots.txt Lines</span> <span>7</span></li>
+                    <li><span>Sitemap Entries</span> <span>2071</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
