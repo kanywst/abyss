@@ -45,7 +45,7 @@ Sleep 500ms
 Enter
 
 # Output Waiting (Scanning takes time due to parallel tasks)
-Sleep 6s
+Sleep 16s
 
 # Demonstration of JSON Pipeline
 Type "clear"

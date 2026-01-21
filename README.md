@@ -108,4 +108,4 @@ To identify a pirate site operator hiding behind Cloudflare:
 
 ## License
 
-MIT License.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.

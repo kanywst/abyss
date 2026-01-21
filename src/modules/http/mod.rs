@@ -38,7 +38,9 @@ pub async fn scan_http(target: &str, client: &Client) -> Result<(Option<HttpData
     
     // Robots/Sitemaps/Security
     let robots = fetch_file_lines(client, &url, "/robots.txt").await;
-    let sitemaps = fetch_file_lines(client, &url, "/sitemap.xml").await;
+    let sitemap_raw = fetch_file(client, &url, "/sitemap.xml").await.unwrap_or_default();
+    let re_loc = Regex::new(r"(?i)<loc>(.*?)</loc>").unwrap();
+    let sitemaps = re_loc.captures_iter(&sitemap_raw).map(|c| c[1].to_string()).collect::<Vec<_>>();
     let security = fetch_file(client, &url, "/.well-known/security.txt").await.ok();
 
     // Merge JS findings
@@ -102,20 +104,20 @@ async fn deep_dive_js(client: &Client, base_url: &str, html: &str) -> (Vec<JsFil
     }
     scripts.sort(); scripts.dedup();
     for script_url in scripts.into_iter().take(30) {
-        if let Ok(resp) = client.get(&script_url).send().await {
-            if let Ok(js_content) = resp.text().await {
-                let js_secrets = mine_secrets(&js_content, &script_url);
-                let js_attr = mine_attribution(&js_content);
-                let endpoints = mine_endpoints(&js_content);
-                if !js_secrets.is_empty() || !endpoints.is_empty() {
-                    results.push(JsFileResult { url: script_url.clone(), endpoints, secrets: js_secrets.clone() });
-                }
-                all_secrets.extend(js_secrets);
-                combined_attr.ga_ids.extend(js_attr.ga_ids);
-                combined_attr.adsense_ids.extend(js_attr.adsense_ids);
-                combined_attr.affiliate_ids.extend(js_attr.affiliate_ids);
-                combined_attr.verification_codes.extend(js_attr.verification_codes);
+        if let Ok(resp) = client.get(&script_url).send().await
+            && let Ok(js_content) = resp.text().await
+        {
+            let js_secrets = mine_secrets(&js_content, &script_url);
+            let js_attr = mine_attribution(&js_content);
+            let endpoints = mine_endpoints(&js_content);
+            if !js_secrets.is_empty() || !endpoints.is_empty() {
+                results.push(JsFileResult { url: script_url.clone(), endpoints, secrets: js_secrets.clone() });
             }
+            all_secrets.extend(js_secrets);
+            combined_attr.ga_ids.extend(js_attr.ga_ids);
+            combined_attr.adsense_ids.extend(js_attr.adsense_ids);
+            combined_attr.affiliate_ids.extend(js_attr.affiliate_ids);
+            combined_attr.verification_codes.extend(js_attr.verification_codes);
         }
     }
     (results, all_secrets, combined_attr)
@@ -146,7 +148,7 @@ fn extract_title(html: &str) -> String {
 }
 
 fn extract_generator(html: &str) -> Option<String> {
-    let re = Regex::new(r#"(?i)<meta\s+name=["']generator["']\s+content=["'](["']+)["']"#).unwrap();
+    let re = Regex::new(r#"(?i)<meta\s+name=["']generator["']\s+content=["']([^"']+)["']"#).unwrap();
     re.captures(html).map(|c| c[1].to_string())
 }
 
@@ -203,8 +205,12 @@ fn mine_attribution(body: &str) -> AttributionData {
     for cap in re_ga.captures_iter(body) { unique_ga.insert(cap[0].to_string()); }
     let re_ads = Regex::new(r"\bpub-\d{16}\b").unwrap();
     for cap in re_ads.captures_iter(body) { unique_ads.insert(cap[0].to_string()); }
-    let re_verify = Regex::new(r#"(?i)name=["'](google-site-verification|facebook-domain-verification|apple-domain-verification|yandex-verification)["']\s+content=["']([^"']+)["']"#).unwrap();
-    for cap in re_verify.captures_iter(body) { unique_verify.insert(format!("{}: {}", &cap[1], &cap[2])); }
+    
+    // Improved verification regex: match name then content, or content then name
+    let re_verify_name_content = Regex::new(r#"(?i)<meta[^>]+name=["'](google-site-verification|facebook-domain-verification|apple-domain-verification|yandex-verification)["'][^>]+content=["']([^"']+)["']"#).unwrap();
+    for cap in re_verify_name_content.captures_iter(body) { unique_verify.insert(format!("{}: {}", &cap[1], &cap[2])); }
+    let re_verify_content_name = Regex::new(r#"(?i)<meta[^>]+content=["']([^"']+)["'][^>]+name=["'](google-site-verification|facebook-domain-verification|apple-domain-verification|yandex-verification)["']"#).unwrap();
+    for cap in re_verify_content_name.captures_iter(body) { unique_verify.insert(format!("{}: {}", &cap[2], &cap[1])); }
     let re_btc = Regex::new(r"\b(1[a-km-zA-HJ-NP-Z1-9]{25,34}|3[a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-zA-HJ-NP-Z0-9]{39,59})\b").unwrap();
     let re_eth = Regex::new(r"\b0x[a-fA-F0-9]{40}\b").unwrap();
     for cap in re_btc.captures_iter(body) { unique_wallet.insert(format!("BTC: {}", &cap[0])); }

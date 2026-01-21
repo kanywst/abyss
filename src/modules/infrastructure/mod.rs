@@ -22,9 +22,10 @@ pub async fn grab_mx_banners(mx_records: &[String]) -> Vec<String> {
                 if let Ok(Ok(n)) = tokio::time::timeout(
                     Duration::from_secs(3),
                     stream.read(&mut buffer)
-                ).await {
-                    if n > 0 {
-                        let banner = String::from_utf8_lossy(&buffer[..n]).trim().to_string();
+                ).await
+                    && n > 0
+                {
+                    let banner = String::from_utf8_lossy(&buffer[..n]).trim().to_string();
                         // Only keep relevant SMTP banners
                         if banner.starts_with("220") {
                             banners.push(format!("{}:{} -> {}", host, port, banner));
@@ -32,7 +33,6 @@ pub async fn grab_mx_banners(mx_records: &[String]) -> Vec<String> {
                             let _ = stream.write_all(b"QUIT\r\n").await;
                             break; // Found one, move to next MX
                         }
-                    }
                 }
             }
         }
